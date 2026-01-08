@@ -1,0 +1,149 @@
+import React, { useState, useEffect } from 'react';
+import { getComplexityAnalysis } from '../api/deepseek';
+import Markdown from 'react-markdown';
+
+interface ComplexityProps {
+  problemData: {
+    title: string;
+    description: string;
+    constraints: string;
+    userCode: string;
+    language: string;
+  };
+  cachedAnalysis: string | null;
+  onAnalysisLoaded: (analysis: string) => void;
+}
+
+const Complexity: React.FC<ComplexityProps> = ({ problemData, cachedAnalysis, onAnalysisLoaded }) => {
+  const [analysis, setAnalysis] = useState<string | null>(cachedAnalysis);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [currentCode, setCurrentCode] = useState<string>('');
+
+  // Extract fresh code from editor when component mounts/updates
+  useEffect(() => {
+    const extractCurrentCode = (): string => {
+      // Try Monaco editor first (current LeetCode)
+      const monacoLines = document.querySelector('.monaco-editor .view-lines');
+      if (monacoLines?.textContent) {
+        return monacoLines.textContent.trim();
+      }
+      
+      // Fallback to CodeMirror
+      const codeMirror = document.querySelector('.CodeMirror-code');
+      if (codeMirror?.textContent) {
+        return codeMirror.textContent.trim();
+      }
+      
+      return '';
+    };
+
+    const code = extractCurrentCode();
+    setCurrentCode(code);
+    console.log('[Complexity] Extracted current code length:', code.length);
+  }, []);
+
+  useEffect(() => {
+    // If we have cached analysis, use it
+    if (cachedAnalysis) {
+      setAnalysis(cachedAnalysis);
+      setLoading(false);
+      return;
+    }
+
+    const checkForErrors = (code: string): string | null => {
+      // Only check if editor is truly empty
+      const trimmed = code.trim();
+      if (!trimmed) return 'Editor is empty';
+      
+      // Skip bracket/brace checking as Monaco editor text extraction can be unreliable
+      // Let the API handle actual syntax validation
+      
+      return null;
+    };
+
+    const fetchAnalysis = async () => {
+      setLoading(true);
+      setError(null);
+      
+      // Check for syntax errors first
+      const syntaxError = checkForErrors(currentCode);
+      if (syntaxError) {
+        setAnalysis(`⚠️ **Code Issue Detected**\n\n${syntaxError}. Please complete or fix your code in the editor before analyzing complexity.`);
+        setLoading(false);
+        return;
+      }
+      
+      try {
+        const result = await getComplexityAnalysis(
+          currentCode,
+          problemData.language
+        );
+        setAnalysis(result);
+        onAnalysisLoaded(result);
+      } catch (err) {
+        console.error('Error fetching complexity analysis:', err);
+        setError('Failed to load complexity analysis. Please check your DeepSeek API integration.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (currentCode && currentCode.trim() !== '') {
+      fetchAnalysis();
+    } else {
+      setAnalysis("💭 **No Code Found**\n\nPlease write your solution in the LeetCode editor to get a complexity analysis.");
+      setLoading(false);
+    }
+  }, [currentCode, problemData.language, cachedAnalysis, onAnalysisLoaded]);
+
+  if (loading) {
+    return (
+      <div style={{ padding: '24px', color: '#888', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '200px' }}>
+        <p>Analyzing your code complexity...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div style={{ padding: '24px', color: '#ff6b6b', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '200px' }}>
+        <p>Error: {error}</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="analysis-card">
+      <div className="analysis-header">
+        <span className="analysis-badge">📊</span>
+        <span>Complexity Analysis</span>
+      </div>
+      {analysis ? (
+        <div className="analysis-body">
+          <Markdown
+            components={{
+              h1: (props) => <h2 {...props} />,
+              h2: (props) => <h3 {...props} />,
+              h3: (props) => <h4 {...props} />,
+              ul: (props) => <ul style={{ listStyle: 'disc' }} {...props} />,
+              ol: (props) => <ol style={{ listStyle: 'decimal' }} {...props} />,
+              table: (props) => <table {...props} />,
+              thead: (props) => <thead {...props} />,
+              tbody: (props) => <tbody {...props} />,
+              tr: (props) => <tr {...props} />,
+              th: (props) => <th {...props} />,
+              td: (props) => <td {...props} />,
+            }}
+          >
+            {analysis}
+          </Markdown>
+        </div>
+      ) : (
+        <p style={{ color: '#888' }}>No analysis available.</p>
+      )}
+    </div>
+  );
+};
+
+export default Complexity;
