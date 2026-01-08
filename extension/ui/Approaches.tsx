@@ -20,8 +20,15 @@ const Approaches: React.FC<ApproachesProps> = ({ problemData, cachedSuggestions,
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    // Reset state when question changes (cachedSuggestions becomes null)
+    if (cachedSuggestions === null) {
+      setSuggestions(null);
+      setError(null);
+    }
+    
     // If we have cached suggestions, use them
     if (cachedSuggestions) {
+      console.log('[Approaches] Using cached suggestions for this question');
       setSuggestions(cachedSuggestions);
       setLoading(false);
       return;

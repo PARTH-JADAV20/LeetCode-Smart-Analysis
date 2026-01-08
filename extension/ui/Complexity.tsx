@@ -10,12 +10,10 @@ interface ComplexityProps {
     userCode: string;
     language: string;
   };
-  cachedAnalysis: string | null;
-  onAnalysisLoaded: (analysis: string) => void;
 }
 
-const Complexity: React.FC<ComplexityProps> = ({ problemData, cachedAnalysis, onAnalysisLoaded }) => {
-  const [analysis, setAnalysis] = useState<string | null>(cachedAnalysis);
+const Complexity: React.FC<ComplexityProps> = ({ problemData }) => {
+  const [analysis, setAnalysis] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [currentCode, setCurrentCode] = useState<string>('');
@@ -44,13 +42,7 @@ const Complexity: React.FC<ComplexityProps> = ({ problemData, cachedAnalysis, on
   }, []);
 
   useEffect(() => {
-    // If we have cached analysis, use it
-    if (cachedAnalysis) {
-      setAnalysis(cachedAnalysis);
-      setLoading(false);
-      return;
-    }
-
+    // DO NOT use cache - complexity analysis must always regenerate from current code
     const checkForErrors = (code: string): string | null => {
       // Only check if editor is truly empty
       const trimmed = code.trim();
@@ -80,7 +72,6 @@ const Complexity: React.FC<ComplexityProps> = ({ problemData, cachedAnalysis, on
           problemData.language
         );
         setAnalysis(result);
-        onAnalysisLoaded(result);
       } catch (err) {
         console.error('Error fetching complexity analysis:', err);
         setError('Failed to load complexity analysis. Please check your DeepSeek API integration.');
@@ -95,7 +86,7 @@ const Complexity: React.FC<ComplexityProps> = ({ problemData, cachedAnalysis, on
       setAnalysis("💭 **No Code Found**\n\nPlease write your solution in the LeetCode editor to get a complexity analysis.");
       setLoading(false);
     }
-  }, [currentCode, problemData.language, cachedAnalysis, onAnalysisLoaded]);
+  }, [currentCode, problemData.language]);
 
   if (loading) {
     return (

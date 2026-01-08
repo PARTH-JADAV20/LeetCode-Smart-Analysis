@@ -14,19 +14,25 @@ interface LeetCodeProblemData {
   language: string;
 }
 
+// Cache storage scoped per question - stored outside component to persist across modal open/close
+// Cache expires after 1 hour
+const CACHE_EXPIRATION_MS = 60 * 60 * 1000; // 1 hour
+const approachCache = new Map<string, { data: string; timestamp: number }>();
+
 const SmartTab: React.FC = () => {
   const [activeSubTab, setActiveSubTab] = useState<'approaches' | 'complexity' | 'copycode'>('approaches');
   const [problemData, setProblemData] = useState<LeetCodeProblemData | null>(null);
   const [loadingProblemData, setLoadingProblemData] = useState(true);
   const [errorProblemData, setErrorProblemData] = useState<string | null>(null);
+  const [questionSlug, setQuestionSlug] = useState<string>('');
   
-  // Cache for API responses
+  // Cache ONLY approach suggestions per question (scoped by slug)
   const [cachedApproaches, setCachedApproaches] = useState<string | null>(null);
-  const [cachedComplexity, setCachedComplexity] = useState<string | null>(null);
+  // DO NOT cache complexity analysis - it must always regenerate
 
   useEffect(() => {
     // Function to extract problem data from LeetCode page (robust selectors + fallbacks)
-    const extractProblemData = (): LeetCodeProblemData | null => {
+    const extractProblemData = (): { data: LeetCodeProblemData; slug: string } | null => {
       try {
         const getText = (selectors: string[]): string | null => {
           for (const sel of selectors) {
@@ -35,6 +41,14 @@ const SmartTab: React.FC = () => {
           }
           return null;
         };
+
+        // Extract question slug from URL for cache key
+        const slugMatch = window.location.pathname.match(/problems\/([a-z0-9-]+)/i);
+        const slug = slugMatch?.[1] || '';
+        if (!slug) {
+          console.error('[Smart Analysis] Could not extract question slug from URL');
+          return null;
+        }
 
         // Title: try multiple selectors, then fallback to URL slug
         const titleCandidates = [
@@ -45,10 +59,7 @@ const SmartTab: React.FC = () => {
         ];
         let title = getText(titleCandidates) || '';
         if (!title) {
-          const m = window.location.pathname.match(/problems\/([a-z0-9-]+)/i);
-          if (m?.[1]) {
-            title = m[1].split('-').map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(' ');
-          }
+          title = slug.split('-').map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(' ');
         }
         if (!title) title = 'Unknown Problem';
 
@@ -77,7 +88,10 @@ const SmartTab: React.FC = () => {
         ];
         const language = (getText(langCandidates) || 'javascript').toLowerCase();
 
-        return { title, description, constraints, userCode, language };
+        return { 
+          data: { title, description, constraints, userCode, language },
+          slug
+        };
       } catch (error) {
         console.error('Error extracting LeetCode problem data:', error);
         return null;
@@ -85,16 +99,46 @@ const SmartTab: React.FC = () => {
     };
 
     setLoadingProblemData(true);
-    const data = extractProblemData();
-    if (data) {
-      console.log('[Smart Analysis] Extracted problem data:', { title: data.title, lang: data.language, codeLen: data.userCode.length });
+    const result = extractProblemData();
+    if (result) {
+      const { data, slug } = result;
+      console.log('[Smart Analysis] Extracted problem data:', { 
+        title: data.title, 
+        slug, 
+        lang: data.language, 
+        codeLen: data.userCode.length 
+      });
+      
+      // Check if question changed - invalidate cache if needed
+      if (slug !== questionSlug) {
+        console.log('[Smart Analysis] Question changed:', questionSlug, '->', slug);
+        setQuestionSlug(slug);
+        
+        // Load cached approaches for this specific question (if not expired)
+        const cached = approachCache.get(slug);
+        if (cached) {
+          const age = Date.now() - cached.timestamp;
+          if (age < CACHE_EXPIRATION_MS) {
+            setCachedApproaches(cached.data);
+            console.log('[Smart Analysis] Cache HIT for question:', slug, `(age: ${Math.round(age / 1000 / 60)}m)`);
+          } else {
+            approachCache.delete(slug);
+            setCachedApproaches(null);
+            console.log('[Smart Analysis] Cache EXPIRED for question:', slug, `(age: ${Math.round(age / 1000 / 60)}m)`);
+          }
+        } else {
+          setCachedApproaches(null);
+          console.log('[Smart Analysis] Cache MISS for question:', slug);
+        }
+      }
+      
       setProblemData(data);
       setErrorProblemData(null);
     } else {
       setErrorProblemData('Failed to extract problem data from LeetCode page. Please ensure you are on a problem page.');
     }
     setLoadingProblemData(false);
-  }, []);
+  }, [questionSlug]);
 
   if (loadingProblemData) {
     console.log('[Smart Analysis UI] Loading problem data...');
@@ -221,14 +265,20 @@ const SmartTab: React.FC = () => {
           <Approaches 
             problemData={problemData} 
             cachedSuggestions={cachedApproaches}
-            onSuggestionsLoaded={setCachedApproaches}
+            onSuggestionsLoaded={(suggestions) => {
+              // Store in per-question cache with timestamp
+              approachCache.set(questionSlug, {
+                data: suggestions,
+                timestamp: Date.now()
+              });
+              setCachedApproaches(suggestions);
+              console.log('[Smart Analysis] Cached approaches for question:', questionSlug);
+            }}
           />
         )}
         {activeSubTab === 'complexity' && (
           <Complexity 
-            problemData={problemData} 
-            cachedAnalysis={cachedComplexity}
-            onAnalysisLoaded={setCachedComplexity}
+            problemData={problemData}
           />
         )}
         {activeSubTab === 'copycode' && (
