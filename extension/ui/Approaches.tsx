@@ -87,12 +87,12 @@ const Approaches: React.FC<ApproachesProps> = ({ problemData, cachedSuggestions,
               h3: (props) => <h4 {...props} />,
               ul: (props) => <ul style={{ listStyle: 'disc' }} {...props} />,
               ol: (props) => <ol style={{ listStyle: 'decimal' }} {...props} />,
-              table: (props) => <table {...props} />,
-              thead: (props) => <thead {...props} />,
+              table: (props) => <table {...props} style={{ width: '100%', borderCollapse: 'collapse', margin: '16px 0', border: '1px solid #444' }} />,
+              thead: (props) => <thead {...props} style={{ backgroundColor: '#2a2a2a', borderBottom: '2px solid #555' }} />,
               tbody: (props) => <tbody {...props} />,
-              tr: (props) => <tr {...props} />,
-              th: (props) => <th {...props} />,
-              td: (props) => <td {...props} />,
+              tr: (props) => <tr {...props} style={{ borderBottom: '1px solid #333' }} />,
+              th: (props) => <th {...props} style={{ padding: '12px 16px', textAlign: 'left', fontWeight: '600', color: '#fff', borderRight: '1px solid #444' }} />,
+              td: (props) => <td {...props} style={{ padding: '10px 16px', color: '#e8e8e8', borderRight: '1px solid #333' }} />,
             }}
           >
             {suggestions}

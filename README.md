@@ -13,9 +13,14 @@ Get conceptual guidance on how to solve problems without spoiling the solution:
 
 ### 📊 Complexity Analysis
 Analyze your submitted code with detailed complexity breakdowns:
-- **Step-by-Step Time Complexity**: Understand how loops, recursion, and operations contribute to overall complexity
-- **Space Complexity Breakdown**: Learn about auxiliary space, recursion stack, and data structures used
-- **Expression Reduction**: See how complex expressions simplify (e.g., O(N + N log N) → O(N log N))
+
+### ⚡ Smart Caching System
+Intelligent in-memory caching for optimal performance:
+- **Approach Suggestions Cached**: Each question's approach suggestions are cached for 1 hour
+- **Per-Question Scoping**: Cache is isolated by question slug (e.g., "two-sum", "longest-substring")
+- **Complexity Always Fresh**: Code complexity analysis regenerates on every request to reflect current editor code
+- **Auto-Expiration**: Cached data automatically expires after 1 hour
+- **Session-Based**: Cache persists while navigating between problems but clears on page refresh
 
 ## 🎯 Why Use This Extension?
 

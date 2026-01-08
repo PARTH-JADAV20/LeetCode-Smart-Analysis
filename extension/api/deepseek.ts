@@ -76,14 +76,21 @@ const mockComplexityAnalysis = (userCode: string, language: string): string => {
 
 
   return `
-### Section A: Time Complexity Breakdown
-${timeBreakdown.join('\n')}
-• Combined complexity: ${timeComplexity}
-• Final Time Complexity: ${timeComplexity}
+## Time Complexity Breakdown
 
-### Section B: Space Complexity Breakdown
-${spaceBreakdown.join('\n')}
-• Total auxiliary space: ${spaceComplexity}
+| Operation | Complexity | Notes |
+|-----------|------------|-------|
+${timeBreakdown.map(item => `| ${item.replace('• ', '')} | ${timeComplexity} | Detected in code |`).join('\n')}
+
+**Final Time Complexity: ${timeComplexity}**
+
+## Space Complexity Breakdown
+
+| Component | Complexity | Notes |
+|-----------|------------|-------|
+${spaceBreakdown.map(item => `| ${item.replace('• ', '')} | ${spaceComplexity} | Auxiliary space |`).join('\n')}
+
+**Total Space Complexity: ${spaceComplexity}**
 `;
 };
 
