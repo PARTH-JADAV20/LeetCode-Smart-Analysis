@@ -1,0 +1,33 @@
+{
+  "manifest_version": 3,
+  "name": "LeetCode Smart Analysis",
+  "version": "1.0",
+  "description": "Adds a 'Smart Analysis' tab to LeetCode problems with AI-powered approach suggestions and complexity analysis.",
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://leetcode.com/problems/*/"],
+      "js": ["contentScript.js"],
+      "css": ["styles.css"],
+      "run_at": "document_end"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["smartAnalysisUI.js", "styles.css", "icons/*"],
+      "matches": ["https://leetcode.com/*"]
+    }
+  ],
+  "permissions": [
+    "activeTab",
+    "scripting"
+  ],
+  "host_permissions": [
+    "https://leetcode.com/*",
+    "https://openrouter.ai/*"
+  ]
+}

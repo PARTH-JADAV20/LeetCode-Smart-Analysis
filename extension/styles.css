@@ -1,0 +1,188 @@
+/*
+  This file contains minimal CSS to help the injected UI blend with LeetCode's existing styles.
+  Most styling for the React components is handled by Tailwind CSS classes.
+*/
+
+/* Define custom properties for colors to be used in raw CSS if needed */
+:root {
+  --primary: #9E7FFF;
+  --secondary: #38bdf8;
+  --accent: #f472b6;
+  --background: #171717;
+  --surface: #262626;
+  --text: #FFFFFF;
+  --textSecondary: #A3A3A3;
+  --border: #2F2F2F;
+  --success: #10b981;
+  --warning: #f59e0b;
+  --error: #ef4444;
+}
+
+/* Ensure the injected tab link looks like other LeetCode tabs */
+.nav-tabs-container .nav-item .nav-link {
+  color: var(--textSecondary);
+  padding: 0.75rem 1rem;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s ease-in-out;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  text-decoration: none; /* Ensure no underline */
+}
+
+.nav-tabs-container .nav-item .nav-link:hover {
+  color: var(--text);
+}
+
+.nav-tabs-container .nav-item .nav-link.active {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+}
+
+/* Ensure the tab content pane is styled correctly */
+.tab-pane-container .tab-pane {
+  display: none; /* Hidden by default */
+  padding-top: 1rem; /* Adjust as needed */
+}
+
+.tab-pane-container .tab-pane.active.show {
+  display: block; /* Show when active */
+}
+
+/* Basic styling for the React root to ensure it fills its container */
+#smart-analysis-react-root {
+  width: 100%;
+  height: 100%;
+}
+
+/* Card-style containers for responses */
+.analysis-card {
+  background: #111318;
+  border: 1px solid #2c2f36;
+  border-radius: 12px;
+  padding: 18px 20px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+}
+
+.analysis-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  color: #e8e8e8;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+}
+
+.analysis-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #2563eb, #7c3aed);
+  color: #fff;
+  font-size: 14px;
+  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.35);
+}
+
+.analysis-body {
+  color: #cfd3dc;
+  line-height: 1.65;
+  font-size: 14px;
+}
+
+.analysis-body h1,
+.analysis-body h2,
+.analysis-body h3,
+.analysis-body h4 {
+  color: #f8fafc;
+  font-weight: 700;
+  margin: 14px 0 8px;
+  line-height: 1.3;
+}
+
+.analysis-body p {
+  margin: 8px 0;
+}
+
+.analysis-body ul,
+.analysis-body ol {
+  margin: 10px 0 10px 18px;
+  padding: 0 0 0 6px;
+  list-style-position: outside;
+  gap: 6px;
+}
+
+.analysis-body li {
+  margin: 6px 0;
+  padding-left: 2px;
+}
+
+.analysis-body code {
+  background: #0f172a;
+  border: 1px solid #1f2937;
+  padding: 2px 6px;
+  border-radius: 6px;
+  font-family: Consolas, 'Courier New', monospace;
+  color: #cbd5f5;
+}
+
+.analysis-body pre {
+  background: #0f172a;
+  border: 1px solid #1f2937;
+  border-radius: 10px;
+  padding: 12px;
+  overflow-x: auto;
+}
+
+.analysis-body strong {
+  color: #f3f4f6;
+  font-weight: 700;
+}
+
+.analysis-body table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 16px 0;
+  background: #0a0d14;
+  border: 1px solid #2c2f36;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.analysis-body thead {
+  background: linear-gradient(135deg, #1e3a8a, #312e81);
+}
+
+.analysis-body th {
+  padding: 12px 14px;
+  text-align: left;
+  font-weight: 700;
+  color: #f8fafc;
+  border-bottom: 2px solid #3b82f6;
+  font-size: 13px;
+  letter-spacing: 0.3px;
+}
+
+.analysis-body td {
+  padding: 10px 14px;
+  border-bottom: 1px solid #1f2937;
+  color: #cbd5f5;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.analysis-body tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.analysis-body tbody tr:hover {
+  background: #0f1419;
+}
+
+.analysis-body td code {
+  padding: 1px 4px;
+  font-size: 12px;
+}
