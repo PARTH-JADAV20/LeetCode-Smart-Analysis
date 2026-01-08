@@ -22,7 +22,7 @@ Analyze your submitted code with detailed complexity breakdowns:
 - ✅ **Learn, Don't Copy**: Focus on problem-solving skills rather than memorizing solutions
 - ✅ **LeetCode-Safe**: No code spoilers, only conceptual guidance
 - ✅ **Seamless Integration**: Works directly within LeetCode's UI as a native tab
-- ✅ **AI-Powered**: Leverages DeepSeek API for intelligent analysis
+- ✅ **AI-Powered**: Leverages OpenRouter API with DeepSeek model for intelligent analysis
 - ✅ **Interview Preparation**: Perfect for understanding algorithmic thinking
 
 ## 🚀 Setup Guide
@@ -31,7 +31,7 @@ Analyze your submitted code with detailed complexity breakdowns:
 - Node.js (v16 or higher)
 - npm or yarn
 - Google Chrome browser
-- DeepSeek API key
+- OpenRouter API key (get one at [openrouter.ai](https://openrouter.ai))
 
 ### Installation
 
@@ -47,9 +47,15 @@ npm install
 ```
 
 #### 3. Configure API Key
-Create a configuration file or update the API key in the extension:
-- Navigate to `extension/api/deepseek.ts`
-- Add your DeepSeek API key
+Create a `.env` file in the project root based on `.env.example`:
+```bash
+cp .env.example .env
+```
+Then edit `.env` and add your OpenRouter API key:
+```
+VITE_OPENROUTER_API_KEY=your_openrouter_api_key_here
+VITE_OPENROUTER_MODEL=deepseek/deepseek-chat
+```
 
 #### 4. Build the Extension
 ```bash
@@ -99,14 +105,14 @@ npm run build:extension
 - **TypeScript** - Type-safe development
 - **Vite** - Build tool and dev server
 - **Tailwind CSS** - Styling
-- **DeepSeek API** - AI-powered analysis
+- **OpenRouter API** - AI-powered analysis using DeepSeek model
 - **Chrome Extension API** - Browser integration
 
 ## 📝 How It Works
 
 1. **User submits a solution** on LeetCode
 2. **Extension extracts** problem description, constraints, and user's code
-3. **Sends data** to DeepSeek API for analysis
+3. **Sends data** to OpenRouter API (using DeepSeek model) for analysis
 4. **Receives structured analysis** with approaches and complexity breakdown
 5. **Renders clean UI** in the Smart Analysis tab
 
